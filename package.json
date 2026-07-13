@@ -1,20 +1,26 @@
 {
-  "name": "webwars-tmp",
+  "name": "gatewars",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "setup": "bash scripts/setup.sh",
+    "setup:win": "scripts\\setup.bat",
+    "launch": "bash scripts/launch.sh",
+    "launch:win": "scripts\\launch.bat"
   },
   "dependencies": {
+    "better-sqlite3": "^12.11.1",
     "next": "16.2.10",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

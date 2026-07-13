@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GateWars (webWars)
 
-## Getting Started
+Local remake of **GateWars** (formerly StarGateWars): a turn-based sci-fi PBBG with realm management, PvP vs living AI rivals, guilds, markets, motherships, and a procedural vector gate stage.
 
-First, run the development server:
+**Stack:** Next.js 16 · React 19 · TypeScript · SQLite (`better-sqlite3`) · Canvas vector visuals  
+**Persistence:** game state lives in `data/gatewars.sqlite` via `/api/save` (legacy browser saves migrate once on boot).
+
+## Quick start
+
+**Linux / macOS**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+chmod +x scripts/setup.sh scripts/launch.sh
+./scripts/setup.sh          # Ubuntu & Bazzite (nvm on immutable systems)
+./scripts/launch.sh         # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Windows**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bat
+scripts\setup.bat
+scripts\launch.bat
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Or if Node **20+** is already installed:
 
-## Learn More
+```bash
+npm install
+npm run dev                 # or: npm run launch / npm run launch:win
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open [http://localhost:3000](http://localhost:3000), create a realm, and play.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## What you get
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Four races with bonuses (Asgard, Goa'uld, Replicator, Tau'ri)
+- Turn economy: Naquadah, Untrained Units, attack turns, covert capacity
+- Training, Armory, Technology, Bank/Vault, Market
+- Attack / Raid / Spy / Sabotage / Assassinate / Eradicate
+- Mothership bay (Gate Wars–style capacity + fitted weapons/shields)
+- Guilds, wars, fleet clusters, planets, rankings, ascension
+- Living AI population with optional LLM minds / forum / mail
+- Attack & intelligence logs, vacation mode, export/import
+- Animated vector gate field (procedural canvas stage)
 
-## Deploy on Vercel
+## Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Command | What it does |
+|---------|----------------|
+| `npm run setup` | Runs `scripts/setup.sh` (Node + `npm install` + smoke build) |
+| `npm run setup:win` | Runs `scripts/setup.bat` (Windows; winget Node LTS if needed) |
+| `npm run launch` | Runs `scripts/launch.sh` (dev server; installs deps if missing) |
+| `npm run launch:win` | Runs `scripts/launch.bat` (Windows launcher) |
+| `npm run dev` | Next.js development server |
+| `npm run build` | Production build |
+| `npm run start` | Serve the production build |
+| `npm run lint` | ESLint (Next core-web-vitals + TypeScript) |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Docs
+
+| Doc | Audience |
+|-----|----------|
+| [`DEV.md`](DEV.md) | **Developers** — stack, deps, scripts, codebase map, how to extend |
+| [`docs/GATEWARS.md`](docs/GATEWARS.md) | Design notes & classic GateWars mechanics mapping |
+| [`AGENTS.md`](AGENTS.md) | Cursor / agent notes for this Next.js version |
+
+## Optional LLM
+
+AI minds, forum posts, and mail can call an OpenAI-compatible endpoint. Configure in **Settings** or via env:
+
+```bash
+export GATEWARS_LLM_BASE_URL="http://127.0.0.1:11434/v1"
+export GATEWARS_LLM_MODEL="llama3.2"
+export GATEWARS_LLM_API_KEY=""   # if required
+```
+
+The game runs fully without an LLM; AI falls back to heuristic brains.
+
+## License / IP
+
+This is a fan remake inspired by GateWars gameplay systems. Avoid shipping copyrighted Stargate media assets; prefer original or GateWars-style naming.

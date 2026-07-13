@@ -1,8 +1,6 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-/.pnp
+# Dependencies
+node_modules/
+.pnp
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -10,32 +8,57 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
+# Next.js
+.next/
+out/
+build/
+dist/
 
-# next.js
-/.next/
-/out/
+# Production / caches
+coverage/
+*.tsbuildinfo
+next-env.d.ts
 
-# production
-/build
+# Environment & secrets
+.env
+.env.*
+!.env.example
 
-# misc
-.DS_Store
-*.pem
-
-# debug
+# Logs & debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+*.log
 
-# env files (can opt-in for committing if needed)
-.env*
+# OS / editor
+.DS_Store
+Thumbs.db
+*.pem
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+*.swp
+*.swo
+*~
 
-# vercel
+# Vercel / deploy
 .vercel
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# Local game persistence (SQLite)
+/data/
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Optional local dumps / backups
+*.save.json
+*.bak
+tmp/
+temp/

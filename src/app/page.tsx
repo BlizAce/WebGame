@@ -1,65 +1,124 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { VectorStage } from "@/components/VectorStage";
+import { RaceWirePreview } from "@/components/RaceWirePreview";
+import { useGame } from "@/lib/game/GameContext";
+import { RACE_LIST } from "@/lib/game/races";
+import type { RaceId } from "@/lib/db/schema";
+
+export default function HomePage() {
+  const { player, ready, startGame } = useGame();
+  const router = useRouter();
+  const [name, setName] = useState("Commander");
+  const [race, setRace] = useState<RaceId>("tauri");
+  const selected = RACE_LIST.find((r) => r.id === race)!;
+
+  useEffect(() => {
+    if (ready && player) router.replace("/play/command-center");
+  }, [ready, player, router]);
+
+  if (!ready) {
+    return (
+      <div className="gw-loading">
+        <div className="gw-loading-ring" aria-hidden />
+        <span>Calibrating gate…</span>
+      </div>
+    );
+  }
+
+  if (player) {
+    return null;
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div
+      className="gw-landing"
+      style={
+        {
+          "--race-primary": selected.colors.primary,
+          "--race-glow": selected.colors.glow,
+          "--race-accent": selected.colors.accent,
+          "--race-secondary": selected.colors.secondary,
+        } as React.CSSProperties
+      }
+    >
+      <section className="gw-hero">
+        <div className="gw-hero-stage">
+          <VectorStage race={race} mode="command" intensity={1.15} />
+        </div>
+        <div className="gw-hero-copy">
+          <h1>GATEWARS</h1>
+          <p>
+            Build your realm, stockpile Naquadah, and strike through the gate.
+            Local sandbox with a server SQLite save.
           </p>
+          <div className="gw-hero-cta">
+            <a className="gw-btn" href="#establish">
+              Establish realm
+            </a>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      <section
+        id="establish"
+        className="gw-panel"
+        style={{ maxWidth: 900, margin: "0 auto" }}
+      >
+        <div className="gw-card">
+          <h2>Establish Realm</h2>
+          <div className="gw-row" style={{ marginBottom: "1rem" }}>
+            <div className="gw-field" style={{ flex: 1 }}>
+              <label htmlFor="name">Commander name</label>
+              <input
+                id="name"
+                className="gw-input"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                maxLength={24}
+              />
+            </div>
+          </div>
+
+          <div className="gw-race-grid">
+            {RACE_LIST.map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                className={`gw-race ${race === r.id ? "is-selected" : ""}`}
+                onClick={() => setRace(r.id)}
+                style={
+                  race === r.id
+                    ? ({
+                        "--race-primary": r.colors.primary,
+                        "--race-glow": r.colors.glow,
+                      } as React.CSSProperties)
+                    : undefined
+                }
+              >
+                <RaceWirePreview race={r.id} active={race === r.id} />
+                <h3 style={{ color: r.colors.accent }}>{r.name}</h3>
+                <p>{r.tagline}</p>
+              </button>
+            ))}
+          </div>
+
+          <div className="gw-row" style={{ marginTop: "1.25rem" }}>
+            <button
+              type="button"
+              className="gw-btn"
+              onClick={() => {
+                startGame(name, race);
+                router.push("/play/command-center");
+              }}
+            >
+              Dial in & begin
+            </button>
+          </div>
         </div>
-      </main>
+      </section>
     </div>
   );
 }
