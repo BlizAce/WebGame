@@ -6,6 +6,8 @@ import { useGame } from "@/lib/game/GameContext";
 import { useGameClock } from "@/lib/game/gameClock";
 import { fetchLlmModels, requestMindLlm } from "@/lib/game/llmClient";
 import { RACE_LIST } from "@/lib/game/races";
+import { formatDuration } from "@/lib/ui/time";
+import { NebulaQualityControl } from "@/components/NebulaQualityControl";
 import type { RaceId } from "@/lib/db/schema";
 
 export default function SettingsPage() {
@@ -73,13 +75,9 @@ function Settings() {
     ? Date.now() - save.rankingsCache.refreshedAt
     : null;
 
-  function formatCountdown(ms: number) {
-    if (!Number.isFinite(ms)) return "—";
-    const s = Math.ceil(ms / 1000);
-    const m = Math.floor(s / 60);
-    const r = s % 60;
-    return `${m}:${r.toString().padStart(2, "0")}`;
-  }
+  // Shared formatter: turn/pulse intervals can exceed an hour, which the old
+  // local m:ss helper rendered as "73:12".
+  const formatCountdown = formatDuration;
 
   function formatRotation(aiCount: number, actors: number, perHour: number) {
     const a = Math.max(1, actors);
@@ -215,6 +213,16 @@ function Settings() {
             {player.vacation ? "End vacation" : "Enter vacation mode"}
           </button>
         </div>
+      </div>
+
+      <div className="gw-card">
+        <h2>Display</h2>
+        <p style={{ color: "var(--gw-muted)" }}>
+          Background effects are a device preference, so they are stored in this
+          browser rather than in your realm save — exporting a realm will not
+          carry another machine&apos;s GPU settings with it.
+        </p>
+        <NebulaQualityControl />
       </div>
 
       <div className="gw-card">

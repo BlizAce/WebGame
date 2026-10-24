@@ -151,6 +151,13 @@ Use before PRs / after large refactors.
 Serves the **already-built** `.next` output (`next start`).  
 Run `npm run build` first.
 
+### `npm run test`
+
+Runs `tests/*.test.ts` with Node's built-in test runner via TypeScript type
+stripping (`node --experimental-strip-types`), so there is no extra toolchain to
+install. Only pure, side-effect-free logic lives here (formatting, stores); UI
+behaviour is verified by hand in the browser.
+
 ### `npm run lint`
 
 Runs ESLint with Next core-web-vitals + TypeScript configs (`eslint.config.mjs`).
@@ -322,6 +329,20 @@ webWars/
 | `gameClock.ts` | Shared clock helpers |
 | `aiWorldContext.ts` | Prompt snippets for LLM AIs |
 | `ProfileContext.tsx` | Realm/guild profile modal state |
+
+### 7.2b UI infrastructure (`src/lib/ui/*`, `src/lib/gfx/*`)
+
+| Module | Purpose |
+|--------|---------|
+| `lib/ui/time.ts` | Duration/countdown formatting (`45s` / `12:07` / `1:04:19`). Use instead of local `m:ss` helpers, which break past an hour. |
+| `lib/ui/toast.ts` | Toast store (module store + `useSyncExternalStore`, same shape as `gameClock`). Newest-first, capped stack, identical title+kind collapses, `ttl: 0` pins. |
+| `lib/gfx/nebula.ts` | GLSL sources + program plumbing for the backdrop shader. No React, so it can be reasoned about and compiled standalone. |
+| `lib/gfx/nebulaTheme.ts` | Backdrop settings: race tint store (write-mostly, read per frame) + quality tier persisted to `localStorage`. |
+
+Components: `NebulaBackdrop` (GL canvas, owns the context), `NebulaLayer` (mounts
+it once below every route and pushes the player's race tint), `ToastViewport`
+(renders the stack, owns auto-dismiss timers), `GameEventToasts` (diffs game
+state into toasts), `KeyboardShortcuts` (bindings + help overlay).
 
 ### 7.3 Server-only (`src/lib/server/*`)
 

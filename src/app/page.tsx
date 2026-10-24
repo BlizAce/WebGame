@@ -114,7 +114,7 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div className="gw-row" style={{ marginTop: "1.25rem" }}>
+          <div className="gw-row" style={{ marginTop: "1.25rem", justifyContent: "space-between", alignItems: "center" }}>
             <button
               type="button"
               className="gw-btn"
@@ -125,6 +125,7 @@ export default function HomePage() {
             >
               Dial in & begin
             </button>
+            <NebulaQualityControl />
           </div>
         </div>
       </section>

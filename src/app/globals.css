@@ -1456,3 +1456,326 @@ select {
     transition: none !important;
   }
 }
+
+/* ==========================================================================
+   Toasts — bottom-right stack, above modals (z 90 > modal 80) so a raid alert
+   is never hidden behind an open profile sheet.
+   ========================================================================== */
+
+.gw-toasts {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 95;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: min(360px, calc(100vw - 2rem));
+  pointer-events: none;
+}
+
+.gw-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.65rem 0.7rem 0.65rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in oklab, var(--race-primary) 30%, var(--gw-border));
+  background: linear-gradient(
+    165deg,
+    color-mix(in oklab, var(--race-primary) 14%, rgba(9, 17, 29, 0.95)),
+    rgba(6, 12, 21, 0.95)
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 14px 40px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  pointer-events: auto;
+  animation: gw-toast-in 260ms var(--gw-ease) both;
+}
+
+@keyframes gw-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.gw-toast-icon {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  color: var(--race-glow);
+}
+
+.gw-toast-success .gw-toast-icon {
+  color: var(--gw-ok);
+}
+
+.gw-toast-warn .gw-toast-icon {
+  color: #ffc27a;
+}
+
+.gw-toast-danger .gw-toast-icon {
+  color: var(--gw-danger);
+}
+
+.gw-toast-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.gw-toast-title {
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.gw-toast-body {
+  margin-top: 0.15rem;
+  font-size: 0.76rem;
+  color: var(--gw-muted);
+  line-height: 1.4;
+}
+
+.gw-toast-close {
+  flex: 0 0 auto;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--gw-muted);
+  font-size: 1.15rem;
+  line-height: 1;
+  padding: 0 0.15rem;
+  cursor: pointer;
+  min-width: 24px;
+  min-height: 24px;
+}
+
+.gw-toast-close:hover {
+  color: var(--gw-text);
+}
+
+/* ==========================================================================
+   Mobile navigation — the 260px sidebar became a drawer below 860px. It was
+   previously a permanent column that squeezed the whole game into ~130px on a
+   phone.
+   ========================================================================== */
+
+.gw-topbar {
+  display: none;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--gw-border);
+  background: rgba(5, 10, 18, 0.92);
+  backdrop-filter: blur(12px);
+}
+
+.gw-topbar-title {
+  font-family: var(--font-display);
+  font-size: 0.86rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.gw-topbar-meta {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: var(--gw-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gw-burger {
+  appearance: none;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 38px;
+  height: 38px;
+  padding: 8px 7px;
+  border-radius: 9px;
+  border: 1px solid var(--gw-border);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+
+.gw-burger span {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--gw-text);
+  transition: transform 160ms var(--gw-ease), opacity 160ms var(--gw-ease);
+}
+
+.gw-nav-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 59;
+  background: rgba(2, 5, 10, 0.6);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms var(--gw-ease);
+}
+
+.gw-nav-scrim.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Help button in the brand row (desktop + drawer). */
+.gw-help-btn {
+  appearance: none;
+  margin-left: auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--gw-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--gw-muted);
+  font-size: 0.8rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 140ms var(--gw-ease), border-color 140ms var(--gw-ease);
+}
+
+.gw-help-btn:hover {
+  color: var(--gw-text);
+  border-color: color-mix(in oklab, var(--race-glow) 55%, transparent);
+}
+
+/* Shortcut list */
+.gw-keys {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 0.3rem 1rem;
+}
+
+.gw-key-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  color: var(--gw-muted);
+}
+
+.gw-keys kbd {
+  flex: 0 0 auto;
+  min-width: 26px;
+  padding: 0.12rem 0.4rem;
+  border-radius: 6px;
+  border: 1px solid var(--gw-border);
+  border-bottom-width: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--gw-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.74rem;
+  text-align: center;
+}
+
+@media (max-width: 860px) {
+  .gw-topbar {
+    display: flex;
+  }
+
+  /* Grid rows: topbar spans both columns, nav is an off-canvas drawer. */
+  .gw-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "top"
+      "main";
+  }
+
+  .gw-topbar {
+    grid-area: top;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+  }
+
+  .gw-main {
+    grid-area: main;
+    min-width: 0;
+  }
+
+  .gw-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 60;
+    width: min(300px, 86vw);
+    overflow-y: auto;
+    transform: translateX(-102%);
+    transition: transform 220ms var(--gw-ease);
+    box-shadow: 24px 0 60px rgba(0, 0, 0, 0.55);
+  }
+
+  .gw-nav.is-open {
+    transform: none;
+  }
+
+  /* The drawer holds ~19 links + HUD: give the tap targets room for thumbs. */
+  .gw-link {
+    padding: 0.7rem 0.8rem;
+    font-size: 0.92rem;
+  }
+
+  .gw-links {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .gw-panel {
+    padding: 1rem 0.85rem 3.5rem;
+  }
+}
+
+/* ==========================================================================
+   Wide tables on small screens. The market/rankings/log tables need ~600px of
+   columns; without a scroll container they widened the mobile layout's initial
+   containing block, which pushed everything (including fixed layers) past the
+   viewport and produced a horizontal scrollbar across the whole game.
+   Scrolling is scoped to the card so the page itself never overflows.
+   ========================================================================== */
+
+@media (max-width: 860px) {
+  .gw-card {
+    /* Scroll horizontally rather than forcing the document wider. */
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    /* Fade hint that there is more content to the right. */
+    mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 28px), transparent 100%);
+  }
+
+  .gw-table {
+    /* Keep columns legible instead of squashing 8 columns into 360px. */
+    min-width: max-content;
+    font-size: 0.84rem;
+  }
+
+  /* Touch targets: realm links rendered as inline buttons were 22px tall,
+     below the ~24px minimum for fingers. */
+  .gw-table .gw-realm-link,
+  .gw-table .gw-btn,
+  .gw-table button {
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .gw-table td,
+  .gw-table th {
+    padding: 0.5rem 0.45rem;
+  }
+}

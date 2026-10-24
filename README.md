@@ -2,7 +2,7 @@
 
 Local remake of **GateWars** (formerly StarGateWars): a turn-based sci-fi PBBG with realm management, PvP vs living AI rivals, guilds, markets, motherships, and a procedural vector gate stage.
 
-**Stack:** Next.js 16 · React 19 · TypeScript · SQLite (`better-sqlite3`) · Canvas vector visuals  
+**Stack:** Next.js 16 · React 19 · TypeScript · SQLite (`better-sqlite3`) · Canvas + WebGL visuals  
 **Persistence:** game state lives in `data/gatewars.sqlite` via `/api/save` (legacy browser saves migrate once on boot).
 
 ## Quick start
@@ -42,6 +42,10 @@ Open [http://localhost:3000](http://localhost:3000), create a realm, and play.
 - Living AI population with optional LLM minds / forum / mail
 - Attack & intelligence logs, vacation mode, export/import
 - Animated vector gate field (procedural canvas stage)
+- Full-screen WebGL nebula backdrop (parallax stars, warp drift, race-tinted)
+- Toast alerts for raids, mail, rank changes and realm destruction
+- Keyboard shortcuts for every screen (press `?` in-game for the list)
+- Mobile-friendly navigation drawer
 
 ## Scripts
 
@@ -55,6 +59,7 @@ Open [http://localhost:3000](http://localhost:3000), create a realm, and play.
 | `npm run build` | Production build |
 | `npm run start` | Serve the production build |
 | `npm run lint` | ESLint (Next core-web-vitals + TypeScript) |
+| `npm test` | Unit tests for pure logic (`tests/*.test.ts`, no test framework needed) |
 
 ## Docs
 
@@ -63,6 +68,16 @@ Open [http://localhost:3000](http://localhost:3000), create a realm, and play.
 | [`DEV.md`](DEV.md) | **Developers** — stack, deps, scripts, codebase map, how to extend |
 | [`docs/GATEWARS.md`](docs/GATEWARS.md) | Design notes & classic GateWars mechanics mapping |
 | [`AGENTS.md`](AGENTS.md) | Cursor / agent notes for this Next.js version |
+
+## Graphics
+
+The background is a procedural WebGL nebula that sits behind every screen and
+tints to your race. Choose **High / Low / Off** on the realm-setup page or in
+**Settings → Display**. The setting is stored per browser (not in your realm
+save), so exporting a realm never carries another machine's GPU preference.
+
+If WebGL is unavailable, or you prefer reduced motion, it falls back to a static
+gradient automatically — nothing needs configuring.
 
 ## Optional LLM
 

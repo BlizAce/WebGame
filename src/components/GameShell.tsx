@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { CSSProperties, ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import { useGame } from "@/lib/game/GameContext";
 import { useGameClock } from "@/lib/game/gameClock";
 import { RACES } from "@/lib/game/races";
@@ -20,6 +26,11 @@ import { FACTIONS, allianceCombatBonus, allianceIncomeBonus, factionOf, getAllia
 import { STAGE_CAPTIONS, stageHullCaption, type StageMode } from "@/lib/gfx/stageThemes";
 import { GuildLink } from "@/components/GuildLink";
 import { AscensionLightning } from "@/components/AscensionLightning";
+import { formatDuration } from "@/lib/ui/time";
+import {
+  ShortcutHelp,
+  useKeyboardShortcuts,
+} from "@/components/KeyboardShortcuts";
 
 const NAV = [
   { href: "/play/command-center", label: "Command Center" },
@@ -43,14 +54,6 @@ const NAV = [
   { href: "/play/settings", label: "Settings" },
 ];
 
-function formatCountdown(ms: number) {
-  if (!Number.isFinite(ms)) return "—";
-  const s = Math.ceil(ms / 1000);
-  const m = Math.floor(s / 60);
-  const r = s % 60;
-  return `${m}:${r.toString().padStart(2, "0")}`;
-}
-
 export function GameShell({
   children,
   stageMode = "command",
@@ -61,6 +64,35 @@ export function GameShell({
   const pathname = usePathname();
   const { player, ready, save, mailUnread } = useGame();
   const { msToTurn, msToAiPulse } = useGameClock();
+
+  // Hooks first: the early returns below must not change hook order between
+  // renders (the classic conditional-hook bug).
+  const { helpOpen, setHelpOpen } = useKeyboardShortcuts({ enabled: ready && !!player });
+
+  // Route changes dismiss the drawer. Derived from the pathname we captured
+  // when it was opened, rather than reset inside an effect — that keeps render
+  // pure and avoids a cascading-render setState-in-effect.
+  const [drawer, setDrawer] = useState<{ open: boolean; at: string }>(() => ({
+    open: false,
+    at: pathname,
+  }));
+  const menuOpen = drawer.at === pathname ? drawer.open : false;
+  const toggleMenu = useCallback(
+    () => setDrawer({ open: !menuOpen, at: pathname }),
+    [menuOpen, pathname],
+  );
+  const closeMenu = useCallback(
+    () => setDrawer({ open: false, at: pathname }),
+    [pathname],
+  );
+
+  // The `M` shortcut is dispatched as a DOM event by the shortcut hook so it
+  // stays independent of shell state. The listener only fires on real input,
+  // so this is not a render-phase state update.
+  useEffect(() => {
+    window.addEventListener("gw:toggle-menu", toggleMenu);
+    return () => window.removeEventListener("gw:toggle-menu", toggleMenu);
+  }, [toggleMenu]);
 
   if (!ready) {
     return (
@@ -97,7 +129,28 @@ export function GameShell({
       }
     >
       <div className="gw-grid">
-        <aside className="gw-nav">
+        {/* Mobile bar: the sidebar becomes a drawer below 860px, so give small
+            screens a way to open it and keep the turn timer visible. */}
+        <header className="gw-topbar">
+          <button
+            type="button"
+            className="gw-burger"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            aria-controls="gw-nav"
+            onClick={toggleMenu}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+          <span className="gw-topbar-title">GateWars</span>
+          <span className="gw-topbar-meta">
+            {formatNaq(player.naquadah)} Naq · {formatDuration(msToTurn)}
+          </span>
+        </header>
+
+        <aside id="gw-nav" className={`gw-nav${menuOpen ? " is-open" : ""}`}>
           <div className="gw-brand">
             <span className="gw-brand-mark">GW</span>
             <div>
@@ -108,6 +161,15 @@ export function GameShell({
                   : race.name}
               </div>
             </div>
+            <button
+              type="button"
+              className="gw-help-btn"
+              onClick={() => setHelpOpen(true)}
+              title="Keyboard shortcuts (?)"
+              aria-label="Keyboard shortcuts"
+            >
+              ?
+            </button>
           </div>
 
           <div className="gw-hud">
@@ -146,7 +208,7 @@ export function GameShell({
                 ) + (save ? guildFundIncome(player, save) : 0),
               )}
             />
-            <HudRow label="Next turn" value={formatCountdown(msToTurn)} />
+            <HudRow label="Next turn" value={formatDuration(msToTurn)} />
             <HudRow
               label="G&R"
               value={formatNaq(player.gloryReputation ?? 0)}
@@ -159,7 +221,7 @@ export function GameShell({
               label="AI pulse"
               value={
                 aiOn
-                  ? `${formatCountdown(msToAiPulse)} (${pulses}/hr)`
+                  ? `${formatDuration(msToAiPulse)} (${pulses}/hr)`
                   : "off"
               }
             />
@@ -236,6 +298,15 @@ export function GameShell({
           <div className="gw-panel">{children}</div>
         </main>
       </div>
+
+      {/* Click-away for the drawer; only interactive on small screens. */}
+      <div
+        className={`gw-nav-scrim${menuOpen ? " is-open" : ""}`}
+        onClick={closeMenu}
+        aria-hidden="true"
+      />
+
+      <ShortcutHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
     </div>
   );
 }
