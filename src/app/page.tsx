@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { VectorStage } from "@/components/VectorStage";
 import { RaceWirePreview } from "@/components/RaceWirePreview";
+import { NebulaQualityControl } from "@/components/NebulaQualityControl";
+import { setNebulaColors } from "@/lib/gfx/nebulaTheme";
 import { useGame } from "@/lib/game/GameContext";
 import { RACE_LIST } from "@/lib/game/races";
 import type { RaceId } from "@/lib/db/schema";
@@ -14,6 +16,13 @@ export default function HomePage() {
   const [name, setName] = useState("Commander");
   const [race, setRace] = useState<RaceId>("tauri");
   const selected = RACE_LIST.find((r) => r.id === race)!;
+
+  // Tint the site-wide nebula with whichever race is being previewed.
+  useEffect(() => {
+    if (player) return;
+    const c = selected.colors;
+    setNebulaColors({ glow: c.glow, primary: c.primary, accent: c.accent });
+  }, [player, selected]);
 
   useEffect(() => {
     if (ready && player) router.replace("/play/command-center");
