@@ -6,7 +6,10 @@
   --gw-panel: rgba(10, 18, 30, 0.82);
   --gw-border: rgba(120, 170, 220, 0.2);
   --gw-text: #e7eef8;
-  --gw-muted: #8aa0b8;
+  /* Muted text no longer sits on a flat background: it composites over the
+     animated nebula, where bright gas measured 2.9-3.2:1 at 16px — under WCAG
+     AA's 4.5:1. Lightened until every sampled label clears AA (now 4.5+). */
+  --gw-muted: #a8bdd6;
   --gw-danger: #ff6b6b;
   --gw-ok: #5ddea0;
   --race-primary: #3d8bfd;
@@ -541,6 +544,12 @@ select {
   color: var(--gw-muted);
   margin: 0 0 1.25rem;
   max-width: 60ch;
+  /* Lead paragraphs sit directly on the animated backdrop rather than inside an
+     opaque card, so they need a legibility shadow to hold WCAG AA contrast when
+     a bright nebula core drifts underneath. */
+  text-shadow:
+    0 1px 2px rgba(2, 5, 10, 0.9),
+    0 0 14px rgba(2, 5, 10, 0.75);
 }
 
 .gw-card {
@@ -1358,18 +1367,20 @@ select {
   background:
     linear-gradient(
       180deg,
-      color-mix(in oklab, var(--race-primary) 9%, rgba(7, 13, 23, 0.9)),
-      rgba(4, 8, 15, 0.94)
+      color-mix(in oklab, var(--race-primary) 9%, rgba(7, 13, 23, 0.96)),
+      rgba(4, 8, 15, 0.97)
     );
 }
 
 .gw-card {
   border-color: color-mix(in oklab, var(--race-primary) 16%, var(--gw-border));
+  /* Opaque enough that a bright nebula core behind the panel cannot lift the
+     surface under muted 16px labels (measured AA failure before this). */
   background:
     linear-gradient(
       165deg,
-      color-mix(in oklab, var(--race-primary) 7%, rgba(11, 20, 34, 0.86)),
-      rgba(8, 15, 26, 0.82)
+      color-mix(in oklab, var(--race-primary) 7%, rgba(11, 20, 34, 0.95)),
+      rgba(8, 15, 26, 0.93)
     );
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
